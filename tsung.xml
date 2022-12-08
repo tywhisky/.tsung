@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/Users/tensakai/.tsung/tsung-1.0.dtd">
+<tsung>
+  <clients>
+    <client host="localhost" use_controller_vm="true" maxusers="30"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="5432" type="tcp"/>
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="10" unit="second">
+      <users arrivalrate="3" unit="second"/>
+    </arrivalphase>
+  </load>
+  <sessions>
+    <session name="pgsql-example" type="ts_pgsql" weight="1">
+      <transaction name="connection">
+        <request>
+          <pgsql type="connect" database="os_service_dev" username="postgres"/>
+        </request>
+      </transaction>
+
+      <request>
+        <pgsql type="sql">BEGIN;</pgsql>
+      </request>
+
+      <request>
+        <pgsql type="sql">UPDATE surveys s SET online_collector_count = online_collector_count + 1 WHERE id = 'c4243a0d-3b58-466b-8fc2-3a048ecbba43'</pgsql>
+      </request>
+
+      <request>
+        <pgsql type = "sql">COMMIT;</pgsql>
+      </request>
+
+      <thinktime value="20"/>
+
+      <request>
+        <pgsql type="close"/>
+      </request>
+    </session>
+  </sessions>
+</tsung>
